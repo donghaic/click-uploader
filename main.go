@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-var URL = "http://clk.cpa.mobcastlead.com/clk?campaign_id=%s&cid=%s&idfa=%s&ip=%s"
+const URL = "http://clk.cpa.mobcastlead.com/clk?campaign_id=%s&cid=%s&idfa=%s&ip=%s"
 
 var (
 	idFile   string
@@ -98,11 +98,11 @@ func syncIdToServer(idFile string) {
 		resp, err := http.Get(reqUrl)
 		if err != nil {
 			fmt.Printf("Send to url = %v ERROR=%v \n", reqUrl, err.Error())
+		} else {
+			resp.Body.Close()
 		}
 
-		//fmt.Println(time.Now().Format("2006-01-02 15:04:05"))
-
-		defer resp.Body.Close()
+		fmt.Printf("%s - %d \n", time.Now().Format("2006-01-02 15:04:05"), lineNum)
 
 	}
 }
