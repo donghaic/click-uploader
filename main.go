@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -32,12 +33,7 @@ func main() {
 	flag.IntVar(&qps, "qps", 1, "request per second")
 	flag.Parse()
 
-	if len(idFile) == 0 {
-		flag.Usage()
-		return
-	}
-
-	if campaign == "" {
+	if len(idFile) == 0 || campaign == "" {
 		flag.Usage()
 		return
 	}
@@ -94,15 +90,21 @@ func syncIdToServer(idFile string) {
 			fmt.Printf("Skip  %d line and start to send http to url %s \n", lineNum, reqUrl)
 		}
 
-		<-throttle // rate limit our Service.Method RPCs
+		<-throttle // rate limit our Service.Method HTTP
 		resp, err := http.Get(reqUrl)
+		var bodyString = ""
 		if err != nil {
 			fmt.Printf("Send to url = %v ERROR=%v \n", reqUrl, err.Error())
 		} else {
+			bodyBytes, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				fmt.Printf("Send to url = %v ERROR=%v \n", reqUrl, err.Error())
+			}
+			bodyString = string(bodyBytes)
 			resp.Body.Close()
 		}
 
-		fmt.Printf("%s - %d \n", time.Now().Format("2006-01-02 15:04:05"), lineNum)
+		fmt.Printf("%s - %d - %s \n", time.Now().Format("2006-01-02 15:04:05"), lineNum, bodyString)
 
 	}
 }
