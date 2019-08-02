@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-const URL = "http://clk.cpa.mobcastlead.com/clk?campaign_id=%s&cid=%s&idfa=%s&ip=%s"
+const URL = "http://xxxxx.com/clk?campaign_id=%s&cid=%s&idfa=%s&ip=%s"
 
 var (
 	idFile   string
