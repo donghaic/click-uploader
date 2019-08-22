@@ -91,20 +91,22 @@ func syncIdToServer(idFile string) {
 		}
 
 		<-throttle // rate limit our Service.Method HTTP
-		resp, err := http.Get(reqUrl)
-		var bodyString = ""
-		if err != nil {
-			fmt.Printf("Send to url = %v ERROR=%v \n", reqUrl, err.Error())
-		} else {
-			bodyBytes, err := ioutil.ReadAll(resp.Body)
+		go func() {
+			resp, err := http.Get(reqUrl)
+			var bodyString = ""
 			if err != nil {
 				fmt.Printf("Send to url = %v ERROR=%v \n", reqUrl, err.Error())
+			} else {
+				bodyBytes, err := ioutil.ReadAll(resp.Body)
+				if err != nil {
+					fmt.Printf("Send to url = %v ERROR=%v \n", reqUrl, err.Error())
+				}
+				bodyString = string(bodyBytes)
+				resp.Body.Close()
 			}
-			bodyString = string(bodyBytes)
-			resp.Body.Close()
-		}
 
-		fmt.Printf("%s - %d - %s \n", time.Now().Format("2006-01-02 15:04:05"), lineNum, bodyString)
+			fmt.Printf("%s - %d - %s \n", time.Now().Format("2006-01-02 15:04:05"), lineNum, bodyString)
+		}()
 
 	}
 }
